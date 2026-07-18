@@ -219,7 +219,7 @@ export default function Contact() {
           <div className="flex flex-col justify-center gap-8">
             <FadeUp delay={100}>
               <h3 className="text-3xl font-bold tracking-tight text-[#F8FAFC] sm:text-4xl">
-                Intreseted in <br className="hidden sm:block" />
+                Interested in <br className="hidden sm:block" />
                 <span className="bg-gradient-to-r from-[#F472B6] to-[#C084FC] bg-clip-text text-transparent">
                   Working together?
                 </span>
