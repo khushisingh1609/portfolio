@@ -1,6 +1,6 @@
 "use client";
 
-const BADGES: string[] = ["CGPA 9.0", "AI/ML", "Problem Solver", "Lifelong Learner"];
+const BADGES: string[] = ["AI/ML", "Fast Learner", "Problem Solver", "Research Oriented"];
 
 const EDUCATION = {
   degree: "B.Tech CSE (AI & ML)",
