@@ -138,7 +138,7 @@ function CTAGroup() {
 function TechStackStrip() {
   const TECH_ROWS = [
     ["Python", "C", "C++", "PostgreSQL","React", "Next.js"],
-    ["Tilwind CSS","Git", "GitHub"]
+    ["Tailwind CSS","Git", "GitHub"]
   ];
 
   return (
