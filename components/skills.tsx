@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { SectionOrbit } from "./section-orbit"; // <-- NEW IMPORT
 
 interface SkillCardProps {
   title: string;
@@ -80,13 +81,19 @@ const LEARNING_ITEMS = [
 
 function SectionHeading({ label, heading, subtitle }: { label: string; heading: string; subtitle: string }) {
   return (
-    <div className="text-center max-w-3xl mx-auto mb-16">
-      <span className="text-[10px] font-bold tracking-[0.25em] text-[#F472B6] uppercase bg-[#F472B6]/5 px-3 py-1 rounded-full border border-[#F472B6]/10">
+    <div className="text-center max-w-3xl mx-auto mb-16 flex flex-col items-center">
+      <span className="text-[10px] font-bold tracking-[0.25em] text-[#F472B6] uppercase bg-[#F472B6]/5 px-3 py-1 rounded-full border border-[#F472B6]/10 mb-4 inline-block">
         {label}
       </span>
-      <h2 className="mt-4 text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#F8FAFC]">
-        {heading}
-      </h2>
+      
+      {/* MODIFIED: Wrapped heading in centered relative container with Orbit */}
+      <div className="relative mt-2 w-fit mx-auto">
+        <SectionOrbit variant="skills" className="scale-75 sm:scale-100 origin-center" />
+        <h2 className="relative z-10 text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#F8FAFC] px-6 py-2">
+          {heading}
+        </h2>
+      </div>
+
       <p className="mt-4 text-base sm:text-lg text-[#F8FAFC]/60 leading-relaxed">
         {subtitle}
       </p>

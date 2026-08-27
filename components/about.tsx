@@ -1,5 +1,7 @@
 "use client";
 
+import { SectionOrbit } from "./section-orbit";
+
 const BADGES: string[] = ["AI/ML", "Fast Learner", "Problem Solver", "Research Oriented"];
 
 const EDUCATION = {
@@ -29,12 +31,15 @@ function SectionLabel() {
 
 function AboutHeading() {
   return (
-    <h2
-      className="mt-3 text-3xl sm:text-4xl font-bold leading-tight text-[#F8FAFC] opacity-0 animate-fade-up"
+    <div 
+      className="relative mt-8 w-fit opacity-0 animate-fade-up" // <-- Changed to mt-8
       style={{ animationDelay: "80ms" }}
     >
-      About Me
-    </h2>
+      <SectionOrbit variant="about" className="scale-75 sm:scale-100 origin-center" />
+      <h2 className="relative z-10 text-3xl sm:text-4xl font-bold leading-tight text-[#F8FAFC]">
+        About Me
+      </h2>
+    </div>
   );
 }
 

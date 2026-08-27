@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { SectionOrbit } from "./section-orbit";
 
 // --- Utility Components ---
 
@@ -55,13 +56,19 @@ function FadeUp({
 
 function SectionHeading() {
   return (
-    <FadeUp className="mx-auto mb-20 max-w-3xl text-center">
-      <span className="inline-block rounded-full border border-[#F472B6]/10 bg-[#F472B6]/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.25em] text-[#F472B6]">
+    <FadeUp className="mx-auto mb-20 max-w-3xl text-center flex flex-col items-center">
+      <span className="mb-4 inline-block rounded-full border border-[#F472B6]/10 bg-[#F472B6]/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.25em] text-[#F472B6]">
         CONTACT
       </span>
-      <h2 className="mt-6 text-3xl font-bold tracking-tight text-[#F8FAFC] sm:text-4xl lg:text-5xl">
-        Let's Connect
-      </h2>
+      
+      {/* The wrapped heading with the glowing pink orbit */}
+      <div className="relative mt-2 w-fit mx-auto">
+        <SectionOrbit variant="contact" className="scale-75 sm:scale-100 origin-center" />
+        <h2 className="relative z-10 text-3xl font-bold tracking-tight text-[#F8FAFC] sm:text-4xl lg:text-5xl">
+          Let's Connect
+        </h2>
+      </div>
+
       <p className="mt-6 text-base leading-relaxed text-[#F8FAFC]/60 sm:text-lg">
         I'm always excited to connect with recruiters, developers, innovators and fellow learners.
         Whether it's an internship opportunity, collaboration, hackathon or simply a conversation about technology, I'd love to hear from you.

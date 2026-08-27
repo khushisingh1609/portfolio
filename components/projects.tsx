@@ -1,420 +1,325 @@
 "use client";
+
 import Image from "next/image";
-import { useEffect, useState, useRef } from "react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { SectionOrbit } from "./section-orbit";
 
-// --- Types & Data ---
-
-interface ButtonProps {
-  label: string;
-  href: string;
-  primary?: boolean;
-  disabled?: boolean;
-}
-
+// --- Data ---
 interface ProjectData {
-  
+  id: string;
   image: string;
-  name: string;
-  tag: string;
-  status?: string;
-  expected?: string;
+  number: string;
+  category: string;
+  title: string;
+  subtitle: string;
   description: string;
-  features: string[];
   tech: string[];
-  links: ButtonProps[];
-
+  link?: string;
 }
 
-const FEATURED_PROJECT: ProjectData = {
-image: "/images/krishisetu.png",
-  name: "KrishiSetu",
-  tag: "Featured Project",
-  description:
-    "An AI-powered market intelligence platform that empowers farmers with crop price prediction, multilingual voice interaction, weather insights and smart selling recommendations.",
-  features: [
-    "AI Price Prediction",
-    "Voice Assistant",
-    "Market Trends",
-    "Weather Insights",
-    "Farmer Dashboard",
-    "Smart Selling Recommendations",
-  ],
-  tech: ["Next.js", "TypeScript", "Tailwind CSS", "Supabase", "PostgreSQL", "Python"],
-  links: [
-  ],
-};
-
-const SECONDARY_PROJECTS: ProjectData[] = [
+const PROJECTS: ProjectData[] = [
   {
-    image: "/images/pothole.png",
-    name: "Smart Pothole Detection System",
-    tag: "Hardware & IoT",
-    description:
-      "An IoT-based road safety system that detects potholes using sensors and provides live monitoring through a dashboard.",
-    features: ["ESP32", "MPU6050", "Ultrasonic Sensor", "Dashboard", "Real-time Monitoring"],
-    tech: ["ESP32", "Arduino IDE", "HTML", "CSS", "JavaScript"],
-    links: [],
+    id: "krishisetu",
+    image: "/images/krishisetu.png",
+    number: "01",
+    category: "AI & FULL-STACK PLATFORM",
+    title: "KrishiSetu",
+    subtitle: "AI-Powered Agricultural Ecosystem",
+    description: "An intelligent platform that empowers farmers with data-driven insights, crop price predictions, and smart decision tools for better harvests and higher profits.",
+    tech: ["AI & ML", "Next.js", "Python", "Computer Vision", "Tailwind CSS"],
+    link: "https://krishisetu-team404.vercel.app/",
   },
   {
+    id: "pothole",
+    image: "/images/pothole.png",
+    number: "02",
+    category: "HARDWARE & IOT",
+    title: "Smart Pothole Detection",
+    subtitle: "IoT-based Road Safety System",
+    description: "A real-time monitoring system that utilizes sensors and microcontrollers to detect road anomalies and ensure safer commutes.",
+    tech: ["ESP32", "IoT", "Arduino", "JavaScript"],
+    link: "#",
+  },
+  {
+    id: "ems",
     image: "/images/education-center.png",
-    name: "Education Management System",
-    tag: "Currently Building",
-    status: "In Progress",
-    expected: "August 2026",
-    description:
-      "A full-stack education management platform designed for students, teachers and administrators with secure authentication, PostgreSQL integration and role-based dashboards.",
-    features: [
-      "Role-Based Login",
-      "Attendance",
-      "Dashboard",
-      "Student Records",
-      "Faculty Panel",
-      "PostgreSQL Database",
-    ],
+    number: "03",
+    category: "WEB APPLICATION",
+    title: "Education Mgmt System",
+    subtitle: "Full-Stack Educational Platform",
+    description: "A comprehensive management system designed for students, teachers, and administrators featuring secure authentication and role-based access.",
     tech: ["Next.js", "PostgreSQL", "TypeScript", "Tailwind CSS"],
-    links: [],
+    link: "#",
   },
 ];
 
-// --- Reusable Components ---
-
+// --- Reusable Section Heading with Orbit ---
 function SectionHeading({ label, heading, subtitle }: { label: string; heading: string; subtitle: string }) {
   return (
-    <div className="mx-auto mb-20 max-w-3xl text-center">
-      <span className="inline-block rounded-full border border-[#F472B6]/10 bg-[#F472B6]/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.25em] text-[#F472B6]">
+    <div className="text-center max-w-3xl mx-auto mb-20 flex flex-col items-center">
+      <span className="text-[10px] font-bold tracking-[0.25em] text-[#F472B6] uppercase bg-[#F472B6]/5 px-3 py-1 rounded-full border border-[#F472B6]/10 mb-4 inline-block">
         {label}
       </span>
-      <h2 className="mt-6 text-3xl font-bold tracking-tight text-[#F8FAFC] sm:text-4xl lg:text-5xl">
-        {heading}
-      </h2>
-      <p className="mt-6 text-base leading-relaxed text-[#F8FAFC]/60 sm:text-lg">
+
+      {/* The wrapped heading with the glowing pink orbit */}
+      <div className="relative mt-2 w-fit mx-auto">
+        <SectionOrbit variant="projects" className="scale-75 sm:scale-100 origin-center" />
+        <h2 className="relative z-10 text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#F8FAFC]">
+          {heading}
+        </h2>
+      </div>
+
+      <p className="mt-4 text-base sm:text-lg text-[#F8FAFC]/60 leading-relaxed">
         {subtitle}
       </p>
     </div>
   );
 }
 
-function StatusBadge({ text, inProgress = false }: { text: string; inProgress?: boolean }) {
-  return (
-    <div
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold backdrop-blur-md ${
-        inProgress
-          ? "border-[#C084FC]/20 bg-[#C084FC]/10 text-[#C084FC]"
-          : "border-[#F472B6]/20 bg-[#F472B6]/10 text-[#F472B6]"
-      }`}
-    >
-      {inProgress && (
-        <span className="relative flex h-2 w-2">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#C084FC] opacity-75"></span>
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-[#C084FC]"></span>
-        </span>
-      )}
-      {text}
-    </div>
-  );
-}
+// --- Typewriter Component ---
+function Typewriter({ text }: { text: string }) {
+  const [displayedText, setDisplayedText] = useState("");
+  const [isTyping, setIsTyping] = useState(true);
 
-function TechChip({ name }: { name: string }) {
-  return (
-    <span className="inline-flex cursor-default select-none items-center rounded-md border border-[#F8FAFC]/5 bg-[#0D1117]/60 px-2.5 py-1 text-xs font-medium text-[#F8FAFC]/70 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-[#F472B6]/30 hover:text-[#F8FAFC] hover:shadow-[0_0_12px_rgba(244,114,182,0.15)]">
-      {name}
-    </span>
-  );
-}
-
-function FeatureTag({ name }: { name: string }) {
-  return (
-    <li className="flex items-center text-sm text-[#F8FAFC]/60">
-      <svg className="mr-2 h-4 w-4 text-[#F472B6]/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-      </svg>
-      {name}
-    </li>
-  );
-}
-
-function ProjectButton({ label, href, primary, disabled }: ButtonProps) {
-  if (disabled) {
-    return (
-      <span className="inline-flex cursor-not-allowed items-center justify-center rounded-lg border border-[#F8FAFC]/10 bg-[#F8FAFC]/5 px-5 py-2.5 text-sm font-semibold text-[#F8FAFC]/40">
-        {label}
-      </span>
-    );
-  }
-
-  return (
-    <a
-      href={href}
-      className={`group relative inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm font-semibold transition-all duration-300 ease-out hover:scale-[1.02] active:scale-[0.98] ${
-        primary
-          ? "bg-gradient-to-r from-[#F472B6] to-[#C084FC] text-[#0D1117] hover:shadow-[0_0_20px_rgba(192,132,252,0.4)]"
-          : "border border-[#F8FAFC]/10 bg-[#161B22]/50 text-[#F8FAFC] hover:border-[#F8FAFC]/30 hover:bg-[#F8FAFC]/10"
-      }`}
-    >
-      {label}
-      {primary && (
-        <svg
-          className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-        </svg>
-      )}
-    </a>
-  );
-}
-
-function ImagePlaceholder({ className = "" }: { className?: string }) {
-  return (
-    <div className={`relative w-full overflow-hidden bg-[#0D1117] ${className}`}>
-      {/* Abstract Mockup Design */}
-      <div className="absolute inset-0 opacity-20 transition-transform duration-700 ease-out group-hover:scale-105">
-        <div className="absolute -left-[20%] -top-[20%] h-[60%] w-[60%] rounded-full bg-[#F472B6] blur-[80px]"></div>
-        <div className="absolute -bottom-[20%] -right-[20%] h-[60%] w-[60%] rounded-full bg-[#C084FC] blur-[80px]"></div>
-      </div>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4 text-[#F8FAFC]/20">
-          <svg className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="1.5"
-              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
-          <span className="font-mono text-sm tracking-widest">UI SCREENSHOT</span>
-        </div>
-      </div>
+  useEffect(() => {
+    setDisplayedText("");
+    setIsTyping(true);
+    let i = 0;
+    
+    const timeout = setTimeout(() => {
+      const intervalId = setInterval(() => {
+        setDisplayedText(text.substring(0, i + 1));
+        i++;
+        if (i >= text.length) {
+          clearInterval(intervalId);
+          setIsTyping(false);
+        }
+      }, 30);
       
-      {/* Sleek browser/app chrome */}
-      <div className="absolute left-4 right-4 top-4 h-full rounded-t-xl border border-[#F8FAFC]/5 bg-[#161B22]/80 shadow-2xl backdrop-blur-sm transition-transform duration-700 ease-out group-hover:translate-y-2">
-        <div className="flex items-center gap-2 border-b border-[#F8FAFC]/5 px-4 py-3">
-          <div className="h-2.5 w-2.5 rounded-full bg-[#F8FAFC]/20"></div>
-          <div className="h-2.5 w-2.5 rounded-full bg-[#F8FAFC]/20"></div>
-          <div className="h-2.5 w-2.5 rounded-full bg-[#F8FAFC]/20"></div>
-        </div>
-        <div className="p-4">
-          <div className="h-4 w-1/3 rounded bg-[#F8FAFC]/5"></div>
-          <div className="mt-4 space-y-2">
-            <div className="h-2 w-full rounded bg-[#F8FAFC]/5"></div>
-            <div className="h-2 w-4/5 rounded bg-[#F8FAFC]/5"></div>
-            <div className="h-2 w-5/6 rounded bg-[#F8FAFC]/5"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+      return () => clearInterval(intervalId);
+    }, 400);
 
-function FeaturedProjectCard({ project }: { project: ProjectData }) {
-  const [isVisible, setIsVisible] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.1 }
-    );
-    if (cardRef.current) observer.observe(cardRef.current);
-    return () => observer.disconnect();
-  }, []);
+    return () => clearTimeout(timeout);
+  }, [text]);
 
   return (
-    <div
-      ref={cardRef}
-      className={`group relative flex w-full flex-col overflow-hidden rounded-3xl border border-[#F8FAFC]/5 bg-[#161B22]/40 backdrop-blur-xl transition-all duration-700 ease-out hover:border-[#F472B6]/30 hover:shadow-[0_20px_60px_rgba(0,0,0,0.4)] lg:flex-row lg:items-stretch ${
-        isVisible ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
-      }`}
-    >
-      <div
-        className="absolute inset-0 -z-10 bg-gradient-to-br from-[#F472B6]/[0.03] to-[#C084FC]/[0.03] opacity-0 transition-opacity duration-700 group-hover:opacity-100"
-        aria-hidden="true"
+    <div className="min-h-[80px]">
+      <span className="text-base leading-relaxed text-[#F8FAFC]/60 sm:text-lg">
+        {displayedText}
+      </span>
+      <motion.span
+        animate={{ opacity: [1, 0, 1] }}
+        transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+        className="ml-1 inline-block h-4 w-[2px] bg-[#F472B6] align-middle shadow-[0_0_8px_#F472B6]"
       />
-
-      {/* Content Side */}
-      <div className="flex flex-1 flex-col justify-center p-8 sm:p-12 lg:w-1/2">
-        <div className="mb-6 flex items-center gap-4">
-          <StatusBadge text={project.tag} />
-        </div>
-
-        <h3 className="text-3xl font-bold tracking-tight text-[#F8FAFC] sm:text-4xl">
-          {project.name}
-        </h3>
-        
-        <p className="mt-4 text-base leading-relaxed text-[#F8FAFC]/70 sm:text-lg">
-          {project.description}
-        </p>
-
-        <div className="mt-8">
-          <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#F8FAFC]/40">
-            Key Features
-          </h4>
-          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {project.features.map((feature) => (
-              <FeatureTag key={feature} name={feature} />
-            ))}
-          </ul>
-        </div>
-
-        <div className="mt-8 flex flex-wrap gap-2">
-          {project.tech.map((tech) => (
-            <TechChip key={tech} name={tech} />
-          ))}
-        </div>
-
-        {project.links.length > 0 && (
-          <div className="mt-10 flex flex-wrap items-center gap-4">
-            {project.links.map((link) => (
-              <ProjectButton key={link.label} {...link} />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Image Side */}
-      <div className="relative min-h-[300px] border-t border-[#F8FAFC]/5 bg-[#0D1117]/50 lg:w-1/2 lg:border-l lg:border-t-0">
-        <Image
-  src={project.image}
-  alt={project.name}
-  fill
-  className="object-cover transition-all duration-500 group-hover:scale-105"
-/>
-      </div>
     </div>
   );
 }
 
-function ProjectCard({ project, index }: { project: ProjectData; index: number }) {
-  const [isVisible, setIsVisible] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.1 }
-    );
-    if (cardRef.current) observer.observe(cardRef.current);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <div
-      ref={cardRef}
-      className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border border-[#F8FAFC]/5 bg-[#161B22]/40 backdrop-blur-xl transition-all duration-700 ease-out hover:-translate-y-2 hover:border-[#C084FC]/30 hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] ${
-        isVisible ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
-      }`}
-      style={{ transitionDelay: `${index * 150}ms` }}
-    >
-      <div
-        className="absolute inset-0 -z-10 bg-gradient-to-br from-[#C084FC]/[0.02] to-[#F472B6]/[0.02] opacity-0 transition-opacity duration-700 group-hover:opacity-100"
-        aria-hidden="true"
-      />
-
-      <div className="relative h-[240px] w-full border-b border-[#F8FAFC]/5 bg-[#0D1117]/50 sm:h-[280px]">
-       <Image
-  src={project.image}
-  alt={project.name}
-  fill
-  className="object-cover transition-all duration-500 group-hover:scale-105"
-/>
-      </div>
-
-      <div className="flex flex-1 flex-col p-6 sm:p-8">
-        <div className="mb-4 flex flex-wrap items-center gap-3">
-          {project.status && (
-            <StatusBadge text={project.status} inProgress={project.status === "In Progress"} />
-          )}
-          {project.expected && (
-            <span className="text-xs font-medium text-[#F8FAFC]/40">
-              Expected: {project.expected}
-            </span>
-          )}
-        </div>
-
-        <h3 className="text-2xl font-bold tracking-tight text-[#F8FAFC]">
-          {project.name}
-        </h3>
-        
-        <p className="mt-3 text-sm leading-relaxed text-[#F8FAFC]/60 sm:text-base">
-          {project.description}
-        </p>
-
-        <div className="mt-6 mb-8 flex-1">
-          <ul className="space-y-2">
-            {project.features.map((feature) => (
-              <FeatureTag key={feature} name={feature} />
-            ))}
-          </ul>
-        </div>
-
-        <div className={project.links.length > 0 || project.status === "In Progress" ? "mb-8 flex flex-wrap gap-2" : "mt-auto flex flex-wrap gap-2"}>
-          {project.tech.map((tech) => (
-            <TechChip key={tech} name={tech} />
-          ))}
-        </div>
-
-        {project.links.length > 0 && (
-          <div className="mt-auto flex flex-wrap items-center gap-3">
-            {project.links.map((link) => (
-              <ProjectButton key={link.label} {...link} />
-            ))}
-          </div>
-        )}
-
-        {project.links.length === 0 && project.status === "In Progress" && (
-          <div className="mt-auto flex flex-col gap-2 rounded-xl border border-[#F8FAFC]/5 bg-[#0D1117]/50 p-4">
-            <div className="flex items-center gap-2">
-              <span className="text-base">🚀</span>
-              <span className="text-sm font-semibold text-[#F8FAFC]">Currently Building</span>
-            </div>
-            <div className="flex items-center justify-between border-t border-[#F8FAFC]/5 pt-2">
-              <span className="text-xs font-medium text-[#F8FAFC]/40">Expected Completion</span>
-              <span className="text-xs font-semibold text-[#C084FC]">{project.expected}</span>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
+// --- Main Component ---
 export default function Projects() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const handleNext = () => {
+    setDirection(1);
+    setCurrentIndex((prev) => (prev === PROJECTS.length - 1 ? 0 : prev + 1));
+  };
+
+  const handlePrev = () => {
+    setDirection(-1);
+    setCurrentIndex((prev) => (prev === 0 ? PROJECTS.length - 1 : prev - 1));
+  };
+
+  const slideVariants: Variants = {
+    enter: (dir: number) => ({
+      x: dir > 0 ? 60 : -60,
+      opacity: 0,
+      filter: "blur(4px)",
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+      filter: "blur(0px)",
+      transition: {
+        x: { type: "spring", stiffness: 300, damping: 30 },
+        opacity: { duration: 0.4 },
+        filter: { duration: 0.4 },
+      },
+    },
+    exit: (dir: number) => ({
+      x: dir < 0 ? 60 : -60,
+      opacity: 0,
+      filter: "blur(4px)",
+      transition: {
+        x: { type: "spring", stiffness: 300, damping: 30 },
+        opacity: { duration: 0.4 },
+        filter: { duration: 0.4 },
+      },
+    }),
+  };
+
+  if (!isMounted) return null;
+
+  const currentProject = PROJECTS[currentIndex];
+  const totalStr = PROJECTS.length.toString().padStart(2, '0');
+
   return (
     <section id="projects" className="relative w-full overflow-hidden bg-[#0D1117] px-6 py-24 sm:py-32 lg:px-16">
-      {/* Background ambient glows */}
-      <div className="pointer-events-none absolute left-0 top-1/4 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-[#F472B6]/[0.03] blur-[120px]" aria-hidden="true" />
-      <div className="pointer-events-none absolute right-0 top-3/4 h-[400px] w-[400px] translate-x-1/3 rounded-full bg-[#C084FC]/[0.03] blur-[120px]" aria-hidden="true" />
+      
+      {/* Background ambient lighting effects */}
+      <div className="pointer-events-none absolute left-0 top-1/4 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-[#F472B6]/[0.03] blur-[140px]" aria-hidden="true" />
+      <div className="pointer-events-none absolute right-0 top-3/4 h-[450px] w-[450px] translate-x-1/3 rounded-full bg-[#C084FC]/[0.03] blur-[140px]" aria-hidden="true" />
 
       <div className="mx-auto max-w-7xl">
+        
         <SectionHeading
           label="MY WORK"
-          heading="Featured Projects"
-          subtitle="A collection of projects that reflect my passion for Artificial Intelligence, Full Stack Development and solving real-world problems."
+          heading="Products I've Built"
+          subtitle="A collection of production-grade software, AI experiments, and full-stack platforms engineered to solve real-world problems."
         />
 
-        <div className="mt-16 flex flex-col gap-8 sm:gap-12">
-          {/* Featured Full Width Project */}
-          <FeaturedProjectCard project={FEATURED_PROJECT} />
+        {/* Carousel Body */}
+        <div className="relative min-h-[450px] w-full overflow-hidden pt-4">
+          <AnimatePresence initial={false} custom={direction} mode="wait">
+            <motion.div
+              key={currentIndex}
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              className="flex w-full flex-col gap-12 lg:flex-row lg:items-center lg:gap-20"
+            >
+              
+              {/* Left Side: Image */}
+              <div className="relative w-full lg:w-1/2 flex flex-col justify-center">
+                {/* Subtle background glow */}
+                <div className="absolute inset-0 -z-10 -translate-x-6 translate-y-6 sm:-translate-x-10 sm:translate-y-10 rounded-[40px] bg-gradient-to-br from-[#F472B6]/15 to-[#C084FC]/5 blur-[60px] transition-all duration-700" />
+                
+                {/* Image container using aspect-[16/10] for perfect screenshot framing */}
+                <div className="relative w-full aspect-[16/10] overflow-hidden rounded-3xl border border-[#F8FAFC]/10 bg-[#0D1117] shadow-2xl group p-1">
+                  <div className="relative h-full w-full overflow-hidden rounded-[20px]">
+                    <Image
+                      src={currentProject.image}
+                      alt={currentProject.title}
+                      fill
+                      className="object-cover object-top transition-transform duration-1000 group-hover:scale-105"
+                    />
+                  </div>
+                </div>
+              </div>
 
-          {/* Two Column Projects Grid */}
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
-            {SECONDARY_PROJECTS.map((project, index) => (
-              <ProjectCard key={project.name} project={project} index={index} />
+              {/* Right Side: Details */}
+              <div className="flex w-full flex-col justify-center lg:w-1/2">
+                
+                <p className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#F472B6]">
+                  {currentProject.number} / {totalStr} &mdash; {currentProject.category}
+                </p>
+                
+                <h3 className="mb-2 flex items-center gap-3 text-4xl font-bold tracking-tight text-[#F8FAFC] sm:text-5xl group">
+                  {currentProject.title}
+                  {currentProject.link && (
+                    <a href={currentProject.link} className="text-[#F8FAFC]/20 transition-all duration-300 hover:text-[#F472B6] hover:scale-110">
+                      <svg className="h-6 w-6 sm:h-8 sm:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+                      </svg>
+                    </a>
+                  )}
+                </h3>
+                
+                <p className="mb-8 text-lg font-medium text-[#C084FC]">
+                  {currentProject.subtitle}
+                </p>
+                
+                <div className="mb-10">
+                  <Typewriter text={currentProject.description} />
+                </div>
+                
+                {/* Tech Stack Pills */}
+                <div className="mb-12 flex flex-wrap gap-3">
+                  {currentProject.tech.map((tech) => (
+                    <span
+                      key={tech}
+                      className="inline-flex cursor-default rounded-md border border-[#F8FAFC]/10 bg-[#0D1117]/80 px-3 py-1.5 text-xs font-medium text-[#F8FAFC]/70 transition-all hover:-translate-y-0.5 hover:border-[#F472B6]/40 hover:text-[#F8FAFC] hover:shadow-[0_0_12px_rgba(244,114,182,0.2)]"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+                
+                {/* CTA Button */}
+                {currentProject.link && (
+                  <div>
+                    <a
+                      href={currentProject.link}
+                      className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#F472B6] to-[#C084FC] px-6 py-3 text-sm font-bold text-[#0D1117] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(244,114,182,0.4)] active:scale-[0.98]"
+                    >
+                      Explore Project
+                      <svg
+                        className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </a>
+                  </div>
+                )}
+                
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Centered Desktop & Mobile Navigation Dock */}
+        <div className="mt-8 flex items-center justify-center gap-6 sm:gap-10 relative z-20">
+          <button
+            onClick={handlePrev}
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-[#F8FAFC]/10 bg-[#161B22]/80 text-[#F8FAFC]/50 backdrop-blur-sm transition-all hover:scale-110 hover:border-[#F472B6]/50 hover:bg-[#F472B6]/10 hover:text-[#F472B6] hover:shadow-[0_0_15px_rgba(244,114,182,0.2)]"
+            aria-label="Previous project"
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          
+          <div className="flex gap-3">
+            {PROJECTS.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  setDirection(i > currentIndex ? 1 : -1);
+                  setCurrentIndex(i);
+                }}
+                className={`h-1.5 rounded-full transition-all duration-500 ease-out ${
+                  i === currentIndex 
+                    ? "w-8 bg-[#F472B6] shadow-[0_0_8px_#F472B6]" 
+                    : "w-2 bg-[#F8FAFC]/20 hover:bg-[#F8FAFC]/50"
+                }`}
+                aria-label={`Go to slide ${i + 1}`}
+              />
             ))}
           </div>
+
+          <button
+            onClick={handleNext}
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-[#F8FAFC]/10 bg-[#161B22]/80 text-[#F8FAFC]/50 backdrop-blur-sm transition-all hover:scale-110 hover:border-[#F472B6]/50 hover:bg-[#F472B6]/10 hover:text-[#F472B6] hover:shadow-[0_0_15px_rgba(244,114,182,0.2)]"
+            aria-label="Next project"
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
+
       </div>
     </section>
   );
