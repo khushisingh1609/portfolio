@@ -24,10 +24,9 @@ const TIMING = {
 /* ---------- 3D Particle System Component ---------- */
 
 function ParticleRing({ phase }: { phase: Phase }) {
-  const count = 2500; // Increased count for a denser, richer ring
+  const count = 2500;
   const meshRef = useRef<THREE.Points>(null);
   
-  // Calculate initial chaotic sphere and the target perfectly structured ring
   const { targets, geometry } = useMemo(() => {
     const pos = new Float32Array(count * 3);
     const tgt = new Float32Array(count * 3);
@@ -37,11 +36,10 @@ function ParticleRing({ phase }: { phase: Phase }) {
     const colorPurple = new THREE.Color('#C084FC');
     const colorCyan = new THREE.Color('#22d3ee');
 
-    const ringRadius = 16; // Size of the circle framing your text
-    const ringThickness = 3; // How "thick" or 3D the ring is
+    const ringRadius = 16; 
+    const ringThickness = 3; 
 
     for (let i = 0; i < count; i++) {
-      // 1. Initial State: Massive Chaotic Sphere
       const r1 = 45 * Math.cbrt(Math.random());
       const theta1 = Math.random() * 2 * Math.PI;
       const phi1 = Math.acos(2 * Math.random() - 1);
@@ -50,9 +48,7 @@ function ParticleRing({ phase }: { phase: Phase }) {
       pos[i * 3 + 1] = r1 * Math.sin(phi1) * Math.sin(theta1); 
       pos[i * 3 + 2] = r1 * Math.cos(phi1);                   
 
-      // 2. Target State: A 3D Torus (Ring)
       const ringAngle = Math.random() * Math.PI * 2;
-      // Random offset to give the ring volume (so it's not a flat line)
       const offsetX = (Math.random() - 0.5) * ringThickness;
       const offsetY = (Math.random() - 0.5) * ringThickness;
       const offsetZ = (Math.random() - 0.5) * (ringThickness * 2); 
@@ -61,7 +57,6 @@ function ParticleRing({ phase }: { phase: Phase }) {
       tgt[i * 3 + 1] = (ringRadius + offsetY) * Math.sin(ringAngle); 
       tgt[i * 3 + 2] = offsetZ;
 
-      // 3. Colors
       const mixedColor = [colorPink, colorPurple, colorCyan][Math.floor(Math.random() * 3)];
       col[i * 3] = mixedColor.r;
       col[i * 3 + 1] = mixedColor.g;
@@ -79,26 +74,22 @@ function ParticleRing({ phase }: { phase: Phase }) {
     if (!meshRef.current) return;
     const posArray = geometry.attributes.position.array as Float32Array;
 
-    // Continuously spin the entire 3D ring like a high-tech loading wheel
     meshRef.current.rotation.z -= delta * 0.4;
-    // Add a slight dynamic 3D tilt
     meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.5) * 0.15;
     meshRef.current.rotation.y = Math.cos(state.clock.elapsedTime * 0.3) * 0.15;
 
     let lerpFactor = 0;
-    if (phase === 2 || phase === 3) lerpFactor = 0.05; // Smoothly pull into the ring
-    if (phase >= 4) lerpFactor = 0.15; // Fast explosion
+    if (phase === 2 || phase === 3) lerpFactor = 0.05; 
+    if (phase >= 4) lerpFactor = 0.15; 
 
     for (let i = 0; i < count; i++) {
       const idx = i * 3;
       
       if (phase >= 2 && phase <= 3) {
-        // Pull particles into the structured ring
         posArray[idx] += (targets[idx] - posArray[idx]) * lerpFactor;
         posArray[idx + 1] += (targets[idx + 1] - posArray[idx + 1]) * lerpFactor;
         posArray[idx + 2] += (targets[idx + 2] - posArray[idx + 2]) * lerpFactor;
       } else if (phase >= 4) {
-        // Explode outward towards the camera
         posArray[idx] *= 1.08;
         posArray[idx + 1] *= 1.08;
         posArray[idx + 2] += 2.5;
@@ -142,8 +133,12 @@ export default function Intro() {
   useEffect(() => {
     setMounted(true);
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    // Check if the user is on a mobile device (screen width less than 768px)
+    const isMobile = window.innerWidth < 768; 
 
-    if (reduce || sessionStorage.getItem(STORAGE_KEY) === 'true') {
+    // If mobile, reduced motion, or already seen, skip the intro immediately
+    if (reduce || isMobile || sessionStorage.getItem(STORAGE_KEY) === 'true') {
       setRemoved(true);
       return;
     }
@@ -165,6 +160,7 @@ export default function Intro() {
     return () => timers.current.forEach(clearTimeout);
   }, []);
 
+  // Return nothing if not mounted, if removed, or if it shouldn't show
   if (!mounted || removed || !shouldShow) return null;
 
   const overlayExiting = phase >= 4;
@@ -180,14 +176,12 @@ export default function Intro() {
       >
         <div className="du-vignette" />
 
-        {/* 3D WebGL Canvas */}
         <div className="du-canvas-container">
           <Canvas camera={{ position: [0, 0, 45], fov: 60 }}>
             <ParticleRing phase={phase} />
           </Canvas>
         </div>
 
-        {/* 2D Crisp Text Overlay (Perfectly Centered inside the Ring) */}
         <motion.div
           className="du-identity"
           variants={identityVariants}
